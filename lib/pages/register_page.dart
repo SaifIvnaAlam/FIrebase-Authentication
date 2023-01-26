@@ -1,4 +1,3 @@
-import 'package:auth_firebase/pages/register_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,28 +6,33 @@ import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 import '../components/square_tile.dart';
 
-class LoginPage extends StatefulWidget {
-  LoginPage({super.key});
+class RegPage extends StatefulWidget {
+  RegPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegPage> createState() => _RegPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegPageState extends State<RegPage> {
   final userNameController = TextEditingController();
 
   final passwordController = TextEditingController();
 
-  void sighUserIn() async {
+  void signUserUp() async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: userNameController.text, password: passwordController.text);
+      final credential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: userNameController.text,
+        password: passwordController.text,
+      );
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
       }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -46,14 +50,14 @@ class _LoginPageState extends State<LoginPage> {
                     height: 40,
                   ),
                   const Icon(
-                    Icons.lock,
+                    Icons.person,
                     size: 100,
                   ),
                   const SizedBox(
                     height: 30,
                   ),
                   Text(
-                    "Wellcome back you\'ve been missed!",
+                    "Please register with e-mail and password",
                     style: TextStyle(
                       color: Colors.grey[700],
                       fontSize: 16,
@@ -78,23 +82,12 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(
                     height: 15,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "Forgot Password?",
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                  ),
                   const SizedBox(
                     height: 20,
                   ),
                   MyButton(
-                    onTap: sighUserIn,
+                    onTap: signUserUp,
+                    buttonText: "Sign up",
                   ),
                   const SizedBox(
                     height: 20,
@@ -145,29 +138,6 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(
                     height: 19,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Not a member?"),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => RegPage()),
-                          );
-                        },
-                        child: const Text(
-                          "Register now",
-                          style: TextStyle(
-                              color: Colors.blueAccent,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  )
                 ],
               ),
             ),
